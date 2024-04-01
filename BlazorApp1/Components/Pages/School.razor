@@ -1,0 +1,80 @@
+﻿@page "/school"
+
+<h3>Skolan</h3>
+
+
+
+<h4>Skolan har @students.Count studenter varav @students.Where(s => s.Age > 20).Count() är äldre än 20 år.</h4>
+
+<table>
+    <thead>
+        <tr>
+            <th>Namn</th>
+            <th>Ålder</th>
+            <th>Epostadress</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in students)
+        {
+            <tr>
+                <td>@student.Name</td>
+                <td>@student.Age</td>
+                <td>@student.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Lägg till en ny student:</h4>
+
+<form>
+    <div>
+        <label for="name">Namn:</label>
+        <input type="text" id="name" @bind="@newStudent.Name" />
+    </div>
+    <div>
+        <label for="age">Ålder:</label>
+        <input type="number" id="age" @bind="@newStudent.Age" />
+    </div>
+    <div>
+        <label for="email">Epostadress:</label>
+        <input type="email" id="email" @bind="@newStudent.Email" />
+    </div>
+    <button type="submit" @onclick="AddStudent">Lägg till</button>
+</form>
+
+
+
+@code {
+    private List<Student> students = new List<Student>
+    {
+        new Student { Name = "Alice", Age = 22, Email = "alice@hotmail.com" },
+        new Student { Name = "Bob", Age = 19, Email = "bob@hotmail.com" },
+        new Student { Name = "Charlie", Age = 25, Email = "charlie@hotmail.com" },
+        new Student { Name = "David", Age = 21, Email = "david@es.com" },
+        new Student { Name = "Eve", Age = 20, Email = "eve@em.com" },
+        new Student { Name = "Frank", Age = 23, Email = "frank@hotmail.com" },
+        new Student { Name = "Grace", Age = 18, Email = "grace@hotmail.com" },
+        new Student { Name = "Henry", Age = 24, Email = "henry@hotmail.com" },
+        new Student { Name = "Ivy", Age = 19, Email = "ivy@hotmail.com" },
+        new Student { Name = "Jack", Age = 12, Email = "jack@hotmail.com" },
+        new Student { Name = "Kate", Age = 20, Email = "kate@hotmail.com" },
+        new Student { Name = "Liam", Age = 21, Email = "liam@hotmail.com" },
+        new Student { Name = "Mia", Age = 23, Email = "mia@hotmail.com" }
+    };
+    private Student newStudent = new Student();
+
+    private void AddStudent()
+    {
+        students.Add(newStudent);
+        newStudent = new Student();
+    }
+
+    public class Student
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Email { get; set; }
+    }
+}

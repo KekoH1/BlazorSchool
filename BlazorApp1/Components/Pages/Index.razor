@@ -1,0 +1,133 @@
+@page "/
+@inject NavigationManager NavigationManager
+
+<h3>Students</h3>
+
+<div>
+    <label for="search">Search:</label>
+    <input type="text" id="search" @bind="@searchTerm" />
+    <button @onclick="SearchStudents">Search</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                <button @onclick="SortByName">Name</button>
+            </th>
+            <th>
+                <button @onclick="SortByBirthday">Birthday</button>
+            </th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in displayedStudents)
+        {
+            <tr>
+                <td>@student.Name</td>
+                <td>@student.Birthday.ToString("yyyy-MM-dd")</td>
+                <td>@student.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <button @onclick="PreviousPage" disabled="@IsFirstPage">Previous</button>
+    <button @onclick="NextPage" disabled="@IsLastPage">Next</button>
+</div>
+
+<div>
+    <p>Number of students with last name containing "wood": @woodStudentsCount</p>
+    <p>Number of students with name containing "Moon": @moonStudentsCount</p>
+</div>
+
+@code {
+    private List<Student> students = new List<Student>
+    {
+        new Student { Name = "Alice Wood", Birthday = new DateTime(1998, 5, 12), Email = "alice@hotmail.com" },
+        new Student { Name = "Bob Moon", Birthday = new DateTime(2000, 10, 25), Email = "bob@hotmail.com" },
+        // Add more students here
+    };
+
+    private List<Student> displayedStudents;
+    private int currentPage = 1;
+    private int pageSize = 6;
+    private string searchTerm = "";
+    private int woodStudentsCount;
+    private int moonStudentsCount;
+
+    private bool IsFirstPage => currentPage == 1;
+    private bool IsLastPage => currentPage == TotalPages;
+
+    private int TotalPages => (int)Math.Ceiling((double)students.Count / pageSize);
+
+    protected override void OnInitialized()
+    {
+        UpdateDisplayedStudents();
+        UpdateWoodStudentsCount();
+        UpdateMoonStudentsCount();
+    }
+
+    private void UpdateDisplayedStudents()
+    {
+        var filteredStudents = students.Where(s => s.Name.ToLower().Contains(searchTerm.ToLower())).ToList();
+        displayedStudents = filteredStudents.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+    private void UpdateWoodStudentsCount()
+    {
+        woodStudentsCount = students.Count(s => s.Name.ToLower().Contains("wood"));
+    }
+
+    private void UpdateMoonStudentsCount()
+    {
+        moonStudentsCount = students.Count(s => s.Name.ToLower().Contains("moon"));
+    }
+
+    private void SortByName()
+    {
+        students = students.OrderBy(s => s.Name).ToList();
+        UpdateDisplayedStudents();
+    }
+
+    private void SortByBirthday()
+    {
+        students = students.OrderBy(s => s.Birthday).ToList();
+        UpdateDisplayedStudents();
+    }
+
+    private void PreviousPage()
+    {
+        if (!IsFirstPage)
+        {
+            currentPage--;
+            UpdateDisplayedStudents();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (!IsLastPage)
+        {
+            currentPage++;
+            UpdateDisplayedStudents();
+        }
+    }
+
+    private void SearchStudents()
+    {
+        currentPage = 1;
+        UpdateDisplayedStudents();
+        UpdateWoodStudentsCount();
+        UpdateMoonStudentsCount();
+    }
+
+    public class Student
+    {
+        public string Name { get; set; }
+        public DateTime Birthday { get; set; }
+        public string Email { get; set; }
+    }
+}

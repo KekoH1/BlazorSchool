@@ -1,0 +1,29 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+<PageTitle>Greetings</PageTitle>
+
+@{
+    Random random = new Random();
+    int index = random.Next(greetings.Length);
+    string greeting = greetings[index];
+}
+
+<h1>@greeting! Welcome to my Blazor app!</h1>
+
+
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+
+    private string[] greetings = { "Hello", "Hej", "Bonjour", "Hola", "Ciao" };
+
+    private void IncrementCount()
+    {
+       
+        Random random = new Random();
+        int index = random.Next(greetings.Length);
+       
+    }
+}
