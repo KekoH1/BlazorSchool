@@ -2,7 +2,11 @@
 
 <h3>Skolan</h3>
 
-
+<div>
+    <label for="search">Sök efter efternamn:</label>
+    <input type="text" id="search" @bind="@searchKeyword" />
+    <button @onclick="SearchStudents">Sök</button>
+</div>
 
 <h4>Skolan har @students.Count studenter varav @students.Where(s => s.Age > 20).Count() är äldre än 20 år.</h4>
 
@@ -10,15 +14,17 @@
     <thead>
         <tr>
             <th>Namn</th>
+            <th>EfterNamn</th>
             <th>Ålder</th>
             <th>Epostadress</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var student in students)
+        @foreach (var student in filteredStudents)
         {
             <tr>
                 <td>@student.Name</td>
+                <td>@student.LastName</td>
                 <td>@student.Age</td>
                 <td>@student.Email</td>
             </tr>
@@ -44,26 +50,50 @@
     <button type="submit" @onclick="AddStudent">Lägg till</button>
 </form>
 
+<h4>Studentlista:</h4>
 
+<table>
+    <thead>
+        <tr>
+            <th>Namn</th>
+            <th>EfterNamn</th>
+            <th>Ålder</th>
+            <th>Epostadress</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in students.OrderBy(s => s.LastName == searchKeyword ? 0 : 1).ThenBy(s => s.LastName))
+        {
+            <tr>
+                <td>@student.Name</td>
+                <td>@student.LastName</td>
+                <td>@student.Age</td>
+                <td>@student.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
     private List<Student> students = new List<Student>
     {
-        new Student { Name = "Alice", Age = 22, Email = "alice@hotmail.com" },
-        new Student { Name = "Bob", Age = 19, Email = "bob@hotmail.com" },
-        new Student { Name = "Charlie", Age = 25, Email = "charlie@hotmail.com" },
-        new Student { Name = "David", Age = 21, Email = "david@es.com" },
-        new Student { Name = "Eve", Age = 20, Email = "eve@em.com" },
-        new Student { Name = "Frank", Age = 23, Email = "frank@hotmail.com" },
-        new Student { Name = "Grace", Age = 18, Email = "grace@hotmail.com" },
-        new Student { Name = "Henry", Age = 24, Email = "henry@hotmail.com" },
-        new Student { Name = "Ivy", Age = 19, Email = "ivy@hotmail.com" },
-        new Student { Name = "Jack", Age = 12, Email = "jack@hotmail.com" },
-        new Student { Name = "Kate", Age = 20, Email = "kate@hotmail.com" },
-        new Student { Name = "Liam", Age = 21, Email = "liam@hotmail.com" },
-        new Student { Name = "Mia", Age = 23, Email = "mia@hotmail.com" }
+        new Student { Name = "Alice", LastName = "Smith", Age = 22, Email = "alice@hotmail.com" },
+        new Student { Name = "Bob", LastName = "Johnson", Age = 19, Email = "bob@hotmail.com" },
+        new Student { Name = "Charlie", LastName = "Brown", Age = 25, Email = "charlie@hotmail.com" },
+        new Student { Name = "David", LastName = "Davis", Age = 21, Email = "david@hotmail.com" },
+        new Student { Name = "Eve", LastName = "Wilson", Age = 20, Email = "eve@hotmail.com" },
+        new Student { Name = "Frank", LastName = "Miller", Age = 23, Email = "frank@hotmail.com" },
+        new Student { Name = "Grace", LastName = "Anderson", Age = 18, Email = "grace@hotmail.com" },
+        new Student { Name = "Henry", LastName = "Taylor", Age = 24, Email = "henry@hotmail.com" },
+        new Student { Name = "Isabella", LastName = "Clark", Age = 17, Email = "isabella@hotmail.com" },
+        new Student { Name = "Jack", LastName = "Walker", Age = 26, Email = "jack@hotmail.com" },
+        new Student { Name = "Kate", LastName = "Hill", Age = 16, Email = "kate@hotmail.com" },
+        new Student { Name = "Liam", LastName = "Moore", Age = 27, Email = "liam@hotmail.com" },
+        new Student { Name = "Mia", LastName = "Young", Age = 15, Email = "mia@hotmail.com" }
     };
     private Student newStudent = new Student();
+    private string searchKeyword = "";
+    private List<Student> filteredStudents = new List<Student>();
 
     private void AddStudent()
     {
@@ -71,9 +101,15 @@
         newStudent = new Student();
     }
 
+    private void SearchStudents()
+    {
+        filteredStudents = students.Where(s => s.LastName.Contains(searchKeyword)).OrderByDescending(s => s.LastName == searchKeyword).ToList();
+    }
+
     public class Student
     {
         public string Name { get; set; }
+        public string LastName { get; set; }
         public int Age { get; set; }
         public string Email { get; set; }
     }
